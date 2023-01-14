@@ -1,3 +1,8 @@
+
+Run main.py to start the app.  The flask app runs on port 5000.
+
+views.py points the app to index.html in the templates folder.
+
 API endpoints:
 
 GET: localhost:5000/api/meds/
@@ -6,6 +11,3 @@ POST: localhost:5000/api/meds/add requests JSON data for name, notes, and freque
 
 DELETE: localhost:5000/api/meds/delete requests JSON data for name string.
 
-The flask app runs on port 5000.
-
-views.py points the app to index.html in the templates folder.
