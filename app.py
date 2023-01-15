@@ -6,6 +6,8 @@ from datetime import date
 
 app = Flask(__name__)
 
+meds = []
+
 
 def connect_db():
     """Connects to sqlite database."""
@@ -24,10 +26,10 @@ def create_table():
         cur = con.cursor()
         cur.execute("CREATE TABLE medications ("
                     "name TEXT NOT NULL, "
-                    "notes TEXT, "
+                    "dosage TEXT, "
                     "frequency TEXT, "
-                    "dose TEXT, "
-                    "date TEXT)")
+                    "notes TEXT)")
+
 
         con.commit()
         print("User table created.")
@@ -40,27 +42,31 @@ def create_table():
 def insert_medication(medication):
     """Add a new medication entry to the table."""
     new_med = medication
-    try:
-        con = connect_db()
-        cur = con.cursor()
-        cur.execute("INSERT or IGNORE into medications (name, notes, frequency, dose, date) VALUES (?, ?, ?, ?, ?)",
-                    (medication['name'], medication['notes'], medication['frequency'], medication['dose'], medication['date']))
-        con.commit()
-        con.rollback()
-    except:
-        print("Unable to add medication to database.")
-    finally:
-        con.close()
+    #try:
+    con = connect_db()
+    cur = con.cursor()
+    cur.execute("INSERT or IGNORE into medications (name, notes, frequency, dosage) VALUES (?, ?, ?, ?)",
+                (medication['name'], medication['notes'], medication['frequency'], medication['dosage']))
+    con.commit()
+    con.rollback()
+#except:
+ #   print("Unable to add medication to database.")
+#finally:
+    con.close()
 
 
 def get_meds():
     """Get all medications from the table."""
-    meds = []
     try:
         con = connect_db()
         cur = con.cursor()
         cur.execute("SELECT * FROM medications")
-        meds = cur.fetchall()
+        medication_data = cur.fetchall()
+
+        for data in medication_data:
+            dict = {"name": data[0], "dosage": data[1], "frequency": data[2], "notes": data[3]}
+            meds.append(dict)
+
     except:
         print("Error: unable to fetch medications")
     finally:
@@ -88,8 +94,8 @@ def update_med(medication):
     try:
         con = connect_db()
         cur = con.cursor()
-        cur.execute("UPDATE or IGNORE medications SET name = ?, notes = ?, frequency = ?, dose = ?, date = ? WHERE name = ?",
-                    (medication['name'], medication['notes'], medication['frequency'], medication['dose'], medication['date'], medication['name']))
+        cur.execute("UPDATE or IGNORE medications SET name = ?, notes = ?, frequency = ?, dose = ?, WHERE name = ?",
+                    (medication['name'], medication['notes'], medication['frequency'], medication['dosage'], medication['name']))
         con.commit()
     except:
         con.rollback()
@@ -111,22 +117,22 @@ def delete_med(name):
     finally:
         con.close()
 
-''' TEST BLOCK
+# TEST BLOCK
 #example entry and function call
 
-#create_table()
+# create_table()
 
-today = str(date.today())
+# today = str(date.today())
 
-med1 = {"name": "Tylenol", "notes": "Take with food", "frequency": "every day", "dose": "take 2 every 4 hours", "date": today}
-med2 = {"name": "Ibuprofen", "notes": "", "frequency": "every day as needed", "dose": "take 4 every 4 hours", "date": today}
-med3 = {"name": "NotTylenol", "notes": "Take with food", "frequency": 14, "dose": 10}
-med4 = {"name": "NotAdvil", "notes": "Take with food", "frequency": 13, "dose": 3}
+med1 = {"name": "Tylenol", "notes": "Take with food", "frequency": "every day", "dosage": "take 2 every 4 hours"}
+med2 = {"name": "Ibuprofen", "notes": "", "frequency": "every day as needed", "dosage": "take 4 every 4 hours"}
+# med3 = {"name": "NotTylenol", "notes": "Take with food", "frequency": 14, "dosage": 10}
+# med4 = {"name": "NotAdvil", "notes": "Take with food", "frequency": 13, "dosage": 3}
 
 insert_medication(med1)
-#insert_medication(med2)
-#insert_medication(med3)
-#insert_medication(med4)
+insert_medication(med2)
+# insert_medication(med3)
+# insert_medication(med4)
 
 
 #update_med(med1)
@@ -136,4 +142,15 @@ insert_medication(med1)
 
 #print(get_med_by_name("Tylenol"))
 print(get_meds())
-'''
+
+
+
+
+
+
+
+
+
+
+
+
