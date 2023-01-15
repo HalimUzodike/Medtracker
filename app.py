@@ -6,7 +6,7 @@ from datetime import date
 
 app = Flask(__name__)
 
-meds = []
+
 
 
 def connect_db():
@@ -57,6 +57,7 @@ def insert_medication(medication):
 
 def get_meds():
     """Get all medications from the table."""
+    meds = []
     try:
         con = connect_db()
         cur = con.cursor()
