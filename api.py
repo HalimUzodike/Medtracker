@@ -37,8 +37,8 @@ def update_med():
 # def delete_meds(name):
 #     return jsonify(delete_med(name))
 
-@app.route('/api/meds/delete/<id>', methods=['DELETE'])
-def delete_meds(id):
-    return jsonify(delete_med(id))
 
+@app.route('/api/meds/delete/', methods=['DELETE'])
+def delete_meds(name):
+    return jsonify(delete_med(name))
 
