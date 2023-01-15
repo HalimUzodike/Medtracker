@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './MedicationTracker.css';
+import axios from 'axios';
 
 class MedicationTracker extends Component {
     constructor(props) {
@@ -13,6 +14,13 @@ class MedicationTracker extends Component {
         };
     }
 
+    componentDidMount() {
+        // Get initial data from the backend
+        axios.get('http://localhost:5000/medications')
+            .then(res => this.setState({ medications: res.data }))
+            .catch(err => console.log(err));
+    }
+
     handleSubmit = (e) => {
         e.preventDefault();
         const newMedication = {
@@ -21,19 +29,31 @@ class MedicationTracker extends Component {
             frequency: this.state.frequency,
             notes: this.state.notes
         };
-        this.setState(prevState => ({
-            medications: [...prevState.medications, newMedication],
-            medicationName: '',
-            dosage: '',
-            frequency: '',
-            notes: ''
-        }));
+
+        // Send the new medication data to the backend
+        axios.post('http://localhost:5000/medications', newMedication)
+            .then(res => {
+                this.setState(prevState => ({
+                    medications: [...prevState.medications, res.data],
+                    medicationName: '',
+                    dosage: '',
+                    frequency: '',
+                    notes: ''
+                }));
+            })
+            .catch(err => console.log(err));
     }
 
+
     handleDelete = (index) => {
-        this.setState(prevState => ({
-            medications: prevState.medications.filter((medication, i) => i !== index)
-        }));
+        // Delete the medication from the backend
+        axios.delete(`http://localhost:5000/medications/${index}`)
+            .then(res => {
+                this.setState(prevState => ({
+                    medications: prevState.medications.filter((medication, i) => i !== index)
+                }));
+            })
+            .catch(err => console.log(err));
     }
 
     handleEdit = (index) => {
@@ -46,7 +66,36 @@ class MedicationTracker extends Component {
             isEditing: true,
             selectedIndex: index
         });
+    
+        axios.put(`/api/medications/${selectedMedication._id}`, {
+            name: this.state.medicationName,
+            dosage: this.state.dosage,
+            frequency: this.state.frequency,
+            notes: this.state.notes
+        })
+        .then(response => {
+            console.log(response);
+            this.setState(prevState => ({
+                medications: prevState.medications.map((medication, i) => {
+                    if (i !== this.state.selectedIndex) {
+                        return medication;
+                    } else {
+                        return {...medication, ...response.data};
+                    }
+                }),
+                isEditing: false,
+                medicationName: '',
+                dosage: '',
+                frequency: '',
+                notes: '',
+                selectedIndex: null
+            }));
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }
+    
 
     render() {
         return (
