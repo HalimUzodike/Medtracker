@@ -3,26 +3,28 @@
 from flask import Flask
 import sqlite3
 
-
 app = Flask(__name__)
 
 
 def connect_db():
     """Connects to sqlite database."""
-    con = sqlite3.connect('medication.db')
-    return con
+    try:
+        con = sqlite3.connect('medication.db')
+    except:
+        print("medicaiton.db connetion failed")
+    finally:
+        return con
 
 
 def create_table():
     """Creates a medications table in the database."""
     try:
         con = connect_db()
-        con.execute('''CREATE TABLE medications (
-            name TEXT NOT NULL,
-            notes TEXT NOT NULL,
-            frequency INTEGER PRIMARY KEY NOT NULL
-            );
-        ''')
+        cur = con.cursor()
+        cur.execute("CREATE TABLE medications ("
+                    "name TEXT NOT NULL, "
+                    "notes TEXT NOT NULL, "
+                    "frequency INTEGER NOT NULL)")
 
         con.commit()
         print("User table created.")
@@ -38,8 +40,8 @@ def insert_medication(medication):
     try:
         con = connect_db()
         cur = con.cursor()
-        cur.execute("INSERT or IGNORE into medications (name, notes, frequency) VALUES (?, ?, ?)", 
-        (medication['name'], medication['notes'], medication['frequency']))
+        cur.execute("INSERT or IGNORE into medications (name, notes, frequency) VALUES (?, ?, ?)",
+                    (medication['name'], medication['notes'], medication['frequency']))
         con.commit()
         con.rollback()
     except:
@@ -64,21 +66,18 @@ def get_meds():
 
 
 def get_med_by_name(name):
-    """TEST AND FIX THIS FUNCTION"""
     """Get medication data by name."""
-    medication = {}
     try:
         con = connect_db()
-        con.row_factory = sqlite3.Row
         cur = con.cursor()
-        cur.execute("SELECT * FROM medication WHERE name = ?",
-        (name,))
-        row = cur.fetchone()
-
+        cur.execute(f"SELECT * FROM medications WHERE name= ?;",(name,))
+        row = cur.fetchall()
+        print(row)
     except:
-        medication = {}
-    
-    return medication
+        print("get med by name failed")
+    finally:
+        con.close()
+        return row
 
 
 def update_med(medication):
@@ -87,12 +86,12 @@ def update_med(medication):
     try:
         con = connect_db()
         cur = con.cursor()
-        cur.execute("UPDATE users SET name = ?, notes = ?, frequency = ?", 
-        (medication['name'], medication['notes'], medication['frequency']))
+        cur.execute("UPDATE or IGNORE medications SET name = ?, notes = ?, frequency = ? WHERE name = ?",
+                    (medication['name'], medication['notes'], medication['frequency'], medication['name']))
         con.commit()
     except:
-        con.rollback()
-        updated_med = {}
+        # con.rollback()
+        print("update med failed")
     finally:
         con.close()
 
@@ -102,7 +101,7 @@ def delete_med(name):
     try:
         con = connect_db()
         con.execute("DELETE FROM medications WHERE name = ?",
-        (name,))
+                    (name,))
         con.commit()
     except:
         con.rollback()
@@ -111,14 +110,33 @@ def delete_med(name):
         con.close()
 
 
-"""example entry and function call
+# example entry and function call
+
+# create_table()
 
 med1 = {"name": "Tylenol", "notes": "Take with food", "frequency": 1}
 med2 = {"name": "Advil", "notes": "Take with foods", "frequency": 12}
+med3 = {"name": "NotTylenol", "notes": "Take with foodsd", "frequency": 14}
+med4 = {"name": "NotAdvil", "notes": "Take with foodsdd", "frequency": 13}
 
 insert_medication(med1)
 insert_medication(med2)
+insert_medication(med3)
+insert_medication(med4)
+
+medication = {"name": "NotAdvil", "notes": "Take with foodsdd", "frequency": 30}
+new_medication = {"name": "NotAdvil", "notes": "Take with foodsdd", "frequency": 77}
+
+
+update_med(medication)
+update_med(new_medication)
+
+
+
 #print(get_med_by_name("Tylenol"))
-delete_med("Advil")
-print(get_meds())
-"""
+# print(get_med_by_name())
+# print(get_med_by_name())
+#delete_med("Advil")
+# print(get_meds())
+
+

@@ -9,14 +9,28 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 api = Api(app)
 
+
 @app.route('/api/meds/add/', methods=['POST'])
 def add_new_med():
     med = request.get_json()
     return jsonify(insert_medication(med))
 
+
 @app.route('/api/meds/', methods=['GET'])
 def get_all_meds():
-        return jsonify(get_meds())
+    return jsonify(get_meds())
+
+# Having problems with api
+@app.route('/api/meds/<name>', methods=['GET'])
+def get_med_by_name(name):
+    return jsonify(get_med_by_name(name))
+
+
+@app.route('/api/meds/update/', methods=['PUT'])
+def update_med():
+    med = request.get_json()
+    return jsonify(update_med(med))
+
 
 @app.route('/api/meds/delete/', methods=['DELETE'])
 def delete_meds(name):
