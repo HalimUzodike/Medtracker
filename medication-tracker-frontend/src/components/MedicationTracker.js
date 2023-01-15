@@ -8,6 +8,7 @@ class MedicationTracker extends Component {
             medicationName: '',
             dosage: '',
             frequency: '',
+            notes: '',
         };
     }
 
@@ -16,13 +17,15 @@ class MedicationTracker extends Component {
         const newMedication = {
             name: this.state.medicationName,
             dosage: this.state.dosage,
-            frequency: this.state.frequency
+            frequency: this.state.frequency,
+            notes: this.state.notes
         };
         this.setState(prevState => ({
             medications: [...prevState.medications, newMedication],
             medicationName: '',
             dosage: '',
             frequency: '',
+            notes: ''
         }));
     }
 
@@ -38,6 +41,7 @@ class MedicationTracker extends Component {
             medicationName: selectedMedication.name,
             dosage: selectedMedication.dosage,
             frequency: selectedMedication.frequency,
+            notes: selectedMedication.notes,
             isEditing: true,
             selectedIndex: index
         });
@@ -62,6 +66,11 @@ class MedicationTracker extends Component {
                         <input type="text" value={this.state.frequency} onChange={(e) => this.setState({ frequency: e.target.value })} />
                     </label>
                     <br />
+                    <label>
+                        Notes:
+                        <textarea value={this.state.notes} onChange={(e) => this.setState({ notes: e.target.value })} />
+                    </label>
+                    <br />
                     <button type="submit">Add Medication</button>
                 </form>
                 <div>
@@ -72,6 +81,7 @@ class MedicationTracker extends Component {
                                 <th>Name</th>
                                 <th>Dosage</th>
                                 <th>Frequency</th>
+                                <th>Notes</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -82,6 +92,7 @@ class MedicationTracker extends Component {
                                         <td>{medication.name}</td>
                                         <td>{medication.dosage}</td>
                                         <td>{medication.frequency}</td>
+                                        <td>{medication.notes}</td>
                                         <td>
                                             <button onClick={() => this.handleDelete(index)}>Delete</button>
                                             <button onClick={() => this.handleEdit(index)}>Edit</button>
