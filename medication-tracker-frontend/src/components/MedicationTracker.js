@@ -16,7 +16,7 @@ class MedicationTracker extends Component {
 
     componentDidMount() {
         // Get initial data from the backend
-        axios.get('http://localhost:5000/medications')
+        axios.get('http://localhost:5000/api/meds')
             .then(res => this.setState({ medications: res.data }))
             .catch(err => console.log(err));
     }
@@ -31,7 +31,7 @@ class MedicationTracker extends Component {
         };
 
         // Send the new medication data to the backend
-        axios.post('http://localhost:5000/medications', newMedication)
+        axios.post('http://localhost:5000/api/meds/add', newMedication)
             .then(res => {
                 this.setState(prevState => ({
                     medications: [...prevState.medications, res.data],
@@ -45,16 +45,16 @@ class MedicationTracker extends Component {
     }
 
 
-    handleDelete = (index) => {
-        // Delete the medication from the backend
-        axios.delete(`http://localhost:5000/medications/${index}`)
-            .then(res => {
-                this.setState(prevState => ({
-                    medications: prevState.medications.filter((medication, i) => i !== index)
-                }));
-            })
-            .catch(err => console.log(err));
-    }
+handleDelete = (medication) => {
+    // Delete the medication from the backend
+    axios.delete('http://localhost:5000/api/meds/delete/:medicaitonName')
+        .then(res => {
+            this.setState(prevState => ({
+                medications: prevState.medications.filter(m => m.name !== medication.name)
+            }));
+        })
+        .catch(err => console.log(err));
+}
 
     handleEdit = (index) => {
         const selectedMedication = this.state.medications[index];
