@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './MedicationTracker.css';
 
 class MedicationTracker extends Component {
     constructor(props) {
